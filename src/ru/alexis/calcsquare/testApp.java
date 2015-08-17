@@ -2,72 +2,109 @@ package ru.alexis.calcsquare;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
-Описание задачи
-Условия к рассмотрению решения
-? язык программирования Java
-? запуск приложения через public static void main(String args[ ])
-? args[] 2 параметра: первый - файл входных данных, второй - файл для записи ответа.
- java testApp input.txt output.txt
-Задача
-Дано N прямоугольников со сторонами, параллельными осям координат. Требуется
-определить площадь фигуры, образованной объединением данных прямоугольников.
-Входные данные
-Входной файл (первый параметр вызова), в котором идет N строк, содержащих по 4 числа: x1,
-y1, x2, y2 - координаты двух противоположных углов прямоугольника. Все координаты –
-целые числа, не превосходящие по абсолютной величине 10 000. (1 <= N <= 100)
-Выходные данные
-В выходной файл (второй параметр вызова) выведите одно целое число – площадь фигуры.
-Дополнительные условия
-? Объем используемой памяти не должен превышать 16мб.
-? Должна быть проверка на корректность передаваемых параметров (args[]).
-? Должна быть проверка input.txt на корректность формата.
-Примеры
- INPUT:
- 1 1 7 7
- OUTPUT:
- 36
- INPUT:
- 1 1 3 3
- 2 2 4 4
- OUTPUT:
- 7
+ РћРїРёСЃР°РЅРёРµ Р·Р°РґР°С‡Рё
+ РЈСЃР»РѕРІРёСЏ Рє СЂР°СЃСЃРјРѕС‚СЂРµРЅРёСЋ СЂРµС€РµРЅРёСЏ
+    - СЏР·С‹Рє РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёСЏ Java
+    - Р·Р°РїСѓСЃРє РїСЂРёР»РѕР¶РµРЅРёСЏ С‡РµСЂРµР· public static void main(String args[])
+    - args[] 2 РїР°СЂР°РјРµС‚СЂР°: РїРµСЂРІС‹Р№ - С„Р°Р№Р» РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…, РІС‚РѕСЂРѕР№ - С„Р°Р№Р» РґР»СЏ Р·Р°РїРёСЃРё РѕС‚РІРµС‚Р°.
+    java testApp input.txt output.txt
+ Р—Р°РґР°С‡Р°
+    Р”Р°РЅРѕ N РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєРѕРІ СЃРѕ СЃС‚РѕСЂРѕРЅР°РјРё, РїР°СЂР°Р»Р»РµР»СЊРЅС‹РјРё РѕСЃСЏРј РєРѕРѕСЂРґРёРЅР°С‚. РўСЂРµР±СѓРµС‚СЃСЏ
+    РѕРїСЂРµРґРµР»РёС‚СЊ РїР»РѕС‰Р°РґСЊ С„РёРіСѓСЂС‹, РѕР±СЂР°Р·РѕРІР°РЅРЅРѕР№ РѕР±СЉРµРґРёРЅРµРЅРёРµРј РґР°РЅРЅС‹С… РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєРѕРІ.
+ Р’С…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ
+    Р’С…РѕРґРЅРѕР№ С„Р°Р№Р» (РїРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ РІС‹Р·РѕРІР°), РІ РєРѕС‚РѕСЂРѕРј РёРґРµС‚ N СЃС‚СЂРѕРє, СЃРѕРґРµСЂР¶Р°С‰РёС… РїРѕ 4 С‡РёСЃР»Р°: x1,
+    y1, x2, y2 - РєРѕРѕСЂРґРёРЅР°С‚С‹ РґРІСѓС… РїСЂРѕС‚РёРІРѕРїРѕР»РѕР¶РЅС‹С… СѓРіР»РѕРІ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°. Р’СЃРµ РєРѕРѕСЂРґРёРЅР°С‚С‹ вЂ“
+    С†РµР»С‹Рµ С‡РёСЃР»Р°, РЅРµ РїСЂРµРІРѕСЃС…РѕРґСЏС‰РёРµ РїРѕ Р°Р±СЃРѕР»СЋС‚РЅРѕР№ РІРµР»РёС‡РёРЅРµ 10 000. (1 <= N <= 100)
+ Р’С‹С…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ
+    Р’ РІС‹С…РѕРґРЅРѕР№ С„Р°Р№Р» (РІС‚РѕСЂРѕР№ РїР°СЂР°РјРµС‚СЂ РІС‹Р·РѕРІР°) РІС‹РІРµРґРёС‚Рµ РѕРґРЅРѕ С†РµР»РѕРµ С‡РёСЃР»Рѕ вЂ“ РїР»РѕС‰Р°РґСЊ С„РёРіСѓСЂС‹.
+ Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ:
+ - РћР±СЉРµРј РёСЃРїРѕР»СЊР·СѓРµРјРѕР№ РїР°РјСЏС‚Рё РЅРµ РґРѕР»Р¶РµРЅ РїСЂРµРІС‹С€Р°С‚СЊ 16РјР±.
+ - Р”РѕР»Р¶РЅР° Р±С‹С‚СЊ РїСЂРѕРІРµСЂРєР° РЅР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ РїРµСЂРµРґР°РІР°РµРјС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ (args[]).
+ - Р”РѕР»Р¶РЅР° Р±С‹С‚СЊ РїСЂРѕРІРµСЂРєР° input.txt РЅР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ С„РѕСЂРјР°С‚Р°.
+ РџСЂРёРјРµСЂС‹:
+ INPUT:         OUTPUT:     INPUT:         OUTPUT:
+ 1 1 7 7        36          1 1 3 3        7
+                            2 2 4 4
  */
-
 
 public class testApp {
 
     private static BufferedReader is;
     private static BufferedWriter out;
-    private static long square = 0;
+    private static long square = 0;               // calculated square
+    private static boolean isCheckAllFile = true; // if finded wrong line than continue next check
 
     public static void main(String[] args) {
 
-        String line = "";
-        int arr[][] = new int[100][100];
-        int arrcoord[] = new int[4];
+        Runtime r = Runtime.getRuntime();
+        System.out.println("Mem (" + r.totalMemory()/1024/1024 +"): " + r.freeMemory()/1024/1024);
+
+        if(!(args.length == 2 && args[0].equalsIgnoreCase("input.txt") && args[1].equalsIgnoreCase("output.txt"))){
+            System.out.println("Wrong input parameters. Must entered input.txt and output.txt files.");
+            return;
+        }
+
+        String line;
+        ArrayList<String> lines = new ArrayList<String>(100);
+        byte arr[][] = new byte[20][20];
+        //byte arr[][] = new byte[2000][2000];
+        byte arrcoord[] = new byte[4];
+
+        Pattern p = Pattern.compile("^(-?\\d+\\s){3}-?\\d+\\s?$");
+        Matcher m = p.matcher("");
+
+        System.out.println("Mem (" + r.totalMemory()/1024/1024 +"): " + r.freeMemory()/1024/1024);
 
         System.out.println("Start calc square");
         try {
             is = new BufferedReader(new FileReader(args[0]));
             out = new BufferedWriter(new FileWriter(args[1]));
 
+            StringBuilder stringBuilder = new StringBuilder();
+
+            // check for wrong lines and add to array
             while ((line = is.readLine()) != null) {
+                m.reset(line);
+                if(!m.matches()){
+                    System.out.println("Find wrong line #" + line);
+                    if(!isCheckAllFile) return;
+                }else{
+                    System.out.println("Ok line #" + line);
+
+                    lines.add(line);
+                    stringBuilder.append(line);
+                }
+            }
+
+            for (int i = 0; i < lines.size(); i++) {
+
+                line = lines.get(i);
                 System.out.println(line);
                 String c[] = line.split(" ");
 
-                int coord1 = Integer.parseInt(c[0]);
-                int coord2 = Integer.parseInt(c[1]);
-                int coord3 = Integer.parseInt(c[2]);
-                int coord4 = Integer.parseInt(c[3]);
+                byte x1 = Byte.parseByte(c[0]);
+                byte y1 = Byte.parseByte(c[1]);
+                byte x2 = Byte.parseByte(c[2]);
+                byte y2 = Byte.parseByte(c[3]);
+                System.out.println(getLayer(x1*1010) + "x"+(x1*1010%2000)+"=" + getLayer(y1*1010)+"x"+(y1*1010%2000));
+                System.out.println(getLayer(x2*1010) + "x"+(x2*1010%2000)+"=" + getLayer(y2*1010)+"x"+(y2*1010%2000));
 
-                if(square > 0 && arrcoord[0]>=coord1 && arrcoord[2]<=coord3 & arrcoord[1]>=coord2 & arrcoord[3]<=coord4){
+                //check, exist bit or no
+                // x and 255
+
+
+
+                if(square > 0 && x1>=arrcoord[0] && x2<=arrcoord[2] & y1>=arrcoord[1] & y2<=arrcoord[3]){
                     // this figure less than previous. Nothing to calc
                 }else {
-                    for (int j = coord1; j < coord3; j++) {
-                        for (int k = coord2; k < coord4; k++) {
+                    for (int j = x1; j < x2; j++) {
+                        for (int k = y1; k < y2; k++) {
                             if (arr[j][k] == 0) {
+                                arr[j][k] = 1;
                                 square++;
                             } else {
                                 arr[j][k] = 1;
@@ -76,37 +113,44 @@ public class testApp {
                     }
                 }
 
-                arrcoord[0] = coord1;
-                arrcoord[1] = coord2;
-                arrcoord[2] = coord3;
-                arrcoord[3] = coord4;
+                arrcoord[0] = x1;
+                arrcoord[1] = y1;
+                arrcoord[2] = x2;
+                arrcoord[3] = y2;
 
             }
 
             out.write(square + "");
-/*            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 10; i++) {
                 for (int j = 0; j < 10; j++) {
                     System.out.print(arr[i][j]+" ");
                 }
                 System.out.println();
             }
-*/
+
             System.out.println("Finally square is " + square);
 
         }catch(Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if(is != null){
+                    is.close();
+                }
+                if(out != null){
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
-        try {
-            if(is != null){
-                is.close();
-            }
-            if(out != null){
-                out.close();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Runtime r2 = Runtime.getRuntime();
+        System.out.println("Mem (" + r.totalMemory()/1024 +"): " + r.freeMemory()/1024);
+        System.out.println(1 - r2.freeMemory() / r2.totalMemory());
+    }
 
+    private static byte getLayer(int val){
+        return (byte)(val / 2000);
     }
 }
