@@ -1,31 +1,32 @@
 package ru.alexis.calcsquare;
 
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- Описание задачи
- Условия к рассмотрению решения
- - язык программирования Java
- - запуск приложения через public static void main(String args[])
- - args[] 2 параметра: первый - файл входных данных, второй - файл для записи ответа.
+ РћРїРёСЃР°РЅРёРµ Р·Р°РґР°С‡Рё
+ РЈСЃР»РѕРІРёСЏ Рє СЂР°СЃСЃРјРѕС‚СЂРµРЅРёСЋ СЂРµС€РµРЅРёСЏ
+ - СЏР·С‹Рє РїСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёСЏ Java
+ - Р·Р°РїСѓСЃРє РїСЂРёР»РѕР¶РµРЅРёСЏ С‡РµСЂРµР· public static void main(String args[])
+ - args[] 2 РїР°СЂР°РјРµС‚СЂР°: РїРµСЂРІС‹Р№ - С„Р°Р№Р» РІС…РѕРґРЅС‹С… РґР°РЅРЅС‹С…, РІС‚РѕСЂРѕР№ - С„Р°Р№Р» РґР»СЏ Р·Р°РїРёСЃРё РѕС‚РІРµС‚Р°.
  java testApp input.txt output.txt
- Задача
- Дано N прямоугольников со сторонами, параллельными осям координат. Требуется
- определить площадь фигуры, образованной объединением данных прямоугольников.
- Входные данные
- Входной файл (первый параметр вызова), в котором идет N строк, содержащих по 4 числа: x1,
- y1, x2, y2 - координаты двух противоположных углов прямоугольника. Все координаты –
- целые числа, не превосходящие по абсолютной величине 10 000. (1 <= N <= 100)
- Выходные данные
- В выходной файл (второй параметр вызова) выведите одно целое число – площадь фигуры.
- Дополнительные условия:
- - Объем используемой памяти не должен превышать 16мб.
- - Должна быть проверка на корректность передаваемых параметров (args[]).
- - Должна быть проверка input.txt на корректность формата.
- Примеры:
+ Р—Р°РґР°С‡Р°
+ Р”Р°РЅРѕ N РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєРѕРІ СЃРѕ СЃС‚РѕСЂРѕРЅР°РјРё, РїР°СЂР°Р»Р»РµР»СЊРЅС‹РјРё РѕСЃСЏРј РєРѕРѕСЂРґРёРЅР°С‚. РўСЂРµР±СѓРµС‚СЃСЏ
+ РѕРїСЂРµРґРµР»РёС‚СЊ РїР»РѕС‰Р°РґСЊ С„РёРіСѓСЂС‹, РѕР±СЂР°Р·РѕРІР°РЅРЅРѕР№ РѕР±СЉРµРґРёРЅРµРЅРёРµРј РґР°РЅРЅС‹С… РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєРѕРІ.
+ Р’С…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ
+ Р’С…РѕРґРЅРѕР№ С„Р°Р№Р» (РїРµСЂРІС‹Р№ РїР°СЂР°РјРµС‚СЂ РІС‹Р·РѕРІР°), РІ РєРѕС‚РѕСЂРѕРј РёРґРµС‚ N СЃС‚СЂРѕРє, СЃРѕРґРµСЂР¶Р°С‰РёС… РїРѕ 4 С‡РёСЃР»Р°: x1,
+ y1, x2, y2 - РєРѕРѕСЂРґРёРЅР°С‚С‹ РґРІСѓС… РїСЂРѕС‚РёРІРѕРїРѕР»РѕР¶РЅС‹С… СѓРіР»РѕРІ РїСЂСЏРјРѕСѓРіРѕР»СЊРЅРёРєР°. Р’СЃРµ РєРѕРѕСЂРґРёРЅР°С‚С‹ вЂ“
+ С†РµР»С‹Рµ С‡РёСЃР»Р°, РЅРµ РїСЂРµРІРѕСЃС…РѕРґСЏС‰РёРµ РїРѕ Р°Р±СЃРѕР»СЋС‚РЅРѕР№ РІРµР»РёС‡РёРЅРµ 10 000. (1 <= N <= 100)
+ Р’С‹С…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ
+ Р’ РІС‹С…РѕРґРЅРѕР№ С„Р°Р№Р» (РІС‚РѕСЂРѕР№ РїР°СЂР°РјРµС‚СЂ РІС‹Р·РѕРІР°) РІС‹РІРµРґРёС‚Рµ РѕРґРЅРѕ С†РµР»РѕРµ С‡РёСЃР»Рѕ вЂ“ РїР»РѕС‰Р°РґСЊ С„РёРіСѓСЂС‹.
+ Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ СѓСЃР»РѕРІРёСЏ:
+ - РћР±СЉРµРј РёСЃРїРѕР»СЊР·СѓРµРјРѕР№ РїР°РјСЏС‚Рё РЅРµ РґРѕР»Р¶РµРЅ РїСЂРµРІС‹С€Р°С‚СЊ 16РјР±.
+ - Р”РѕР»Р¶РЅР° Р±С‹С‚СЊ РїСЂРѕРІРµСЂРєР° РЅР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ РїРµСЂРµРґР°РІР°РµРјС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ (args[]).
+ - Р”РѕР»Р¶РЅР° Р±С‹С‚СЊ РїСЂРѕРІРµСЂРєР° input.txt РЅР° РєРѕСЂСЂРµРєС‚РЅРѕСЃС‚СЊ С„РѕСЂРјР°С‚Р°.
+ РџСЂРёРјРµСЂС‹:
  INPUT:         OUTPUT:     INPUT:         OUTPUT:
  1 1 7 7        36          1 1 3 3        7
  2 2 4 4
@@ -33,15 +34,17 @@ import java.util.regex.Pattern;
 
 public class testApp {
 
+    private static final short LAYER_SIZE = 2000;
     private static BufferedReader is;
     private static BufferedWriter out;
-    private static long square = 0;               // calculated square
+    private static int square = 0;                // calculated square
     private static boolean isCheckAllFile = true; // if finded wrong line than continue next check
+    private static short[] arrSC = new short[4];
 
     public static void main(String[] args) {
 
         Runtime r = Runtime.getRuntime();
-        System.out.println("Mem (" + r.totalMemory()/1024/1024 +"): " + r.freeMemory()/1024/1024);
+        System.out.println("Mem (" + r.totalMemory()/1024 +"): " + r.freeMemory()/1024);
 
         if(!(args.length == 2 && args[0].equalsIgnoreCase("input.txt") && args[1].equalsIgnoreCase("output.txt"))){
             System.out.println("Wrong input parameters. Must entered input.txt and output.txt files.");
@@ -50,15 +53,15 @@ public class testApp {
 
         String line;
         ArrayList<String> lines = new ArrayList<String>(100);
-        byte arr[][] = new byte[20][20];
-        //byte arr[][] = new byte[2000][2000];
+        //short arr[][] = new short[20][20];
+        short arr[][] = new short[2000][2000];
         short arrcoord[] = new short[4];
         short x1,x2,y1,y2;
 
         Pattern p = Pattern.compile("^(-?\\d+\\s){3}-?\\d+\\s?$");
         Matcher m = p.matcher("");
 
-        System.out.println("Mem (" + r.totalMemory()/1024/1024 +"): " + r.freeMemory()/1024/1024);
+        System.out.println("Mem (" + r.totalMemory()/1024 +"): " + r.freeMemory()/1024);
         System.out.println("Start calc square");
 
         try {
@@ -80,60 +83,6 @@ public class testApp {
                     stringBuilder.append(line);
                 }
             }
-
-            for (int i = 0; i < lines.size(); i++) {
-
-                line = lines.get(i);
-                System.out.println(line);
-                String c[] = line.split(" ");
-
-                x1 = Short.parseShort(c[0]);
-                y1 = Short.parseShort(c[1]);
-                x2 = Short.parseShort(c[2]);
-                y2 = Short.parseShort(c[3]);
-                System.out.println(getLayer(x1*1010) + "x"+(x1*1010%2000)+"=" + getLayer(y1*1010)+"x"+(y1*1010%2000));
-                System.out.println(getLayer(x2*1010) + "x"+(x2*1010%2000)+"=" + getLayer(y2*1010)+"x"+(y2*1010%2000));
-
-                //check, exist bit or no
-                // x and 0xFFFF
-
-                //set need bit
-                // x xor 0xFFFF
-
-
-
-                if(square > 0 && x1>=arrcoord[0] && x2<=arrcoord[2] & y1>=arrcoord[1] & y2<=arrcoord[3]){
-                    // this figure less than previous. Nothing to calc
-                }else {
-                    for (int j = x1; j < x2; j++) {
-                        for (int k = y1; k < y2; k++) {
-                            if (arr[j][k] == 0) {
-                                arr[j][k] = 1;
-                                square++;
-                            } else {
-                                arr[j][k] = 1;
-                            }
-                        }
-                    }
-                }
-
-                arrcoord[0] = x1;
-                arrcoord[1] = y1;
-                arrcoord[2] = x2;
-                arrcoord[3] = y2;
-
-            }
-
-            out.write(square + "");
-            for (int i = 0; i < 10; i++) {
-                for (int j = 0; j < 10; j++) {
-                    System.out.print(arr[i][j]+" ");
-                }
-                System.out.println();
-            }
-
-            System.out.println("Finally square is " + square);
-
         }catch(Exception e) {
             e.printStackTrace();
         } finally {
@@ -141,20 +90,124 @@ public class testApp {
                 if(is != null){
                     is.close();
                 }
-                if(out != null){
-                    out.close();
-                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
+        for (int i = 0; i < lines.size(); i++) {
+
+            line = lines.get(i);
+            System.out.println(line);
+            String c[] = line.split(" ");
+
+            x1 = Short.parseShort(c[0]);
+            y1 = Short.parseShort(c[1]);
+            x2 = Short.parseShort(c[2]);
+            y2 = Short.parseShort(c[3]);
+
+            for (short j = 0; j <= 3; j++) {
+                arrSC[j] = (short)(Short.parseShort(c[j])+10000);
+            }
+            if (arrSC[2] < arrSC[0]){
+                short res = arrSC[0];
+                arrSC[0] = arrSC[2];
+                arrSC[2] = res;
+            }
+            if (arrSC[3] < arrSC[1]){
+                short res = arrSC[1];
+                arrSC[1] = arrSC[3];
+                arrSC[3] = res;
+            }
+//            System.out.println(getLayer(x1*1010) + "x"+(x1*1010%2000)+"=" + getLayer(y1*1010)+"x"+(y1*1010%2000));
+//            System.out.println(getLayer(x2*1010) + "x"+(x2*1010%2000)+"=" + getLayer(y2*1010)+"x"+(y2*1010%2000));
+            if(square > 0 && x1>=arrcoord[0] && x2<=arrcoord[2] & y1>=arrcoord[1] & y2<=arrcoord[3]){
+                // this figure less than previous. Nothing to calc
+            }else {
+                calcRect(arr, arrSC);
+            }
+
+            arrcoord[0] = x1;
+            arrcoord[1] = y1;
+            arrcoord[2] = x2;
+            arrcoord[3] = y2;
+        }
+
+        try {
+            out.write(square + "");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if(out != null){
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        System.out.println("Finally square is " + square);
+
+        printArray(arr);
+
         Runtime r2 = Runtime.getRuntime();
-        System.out.println("Mem (" + r.totalMemory()/1024 +"): " + r.freeMemory()/1024);
-        System.out.println(1 - r2.freeMemory() / r2.totalMemory());
+        System.out.println("Mem (" + r2.totalMemory()/1024 +"): " + r2.freeMemory()/1024);
+    }
+    private static void calcRect(short[][] arr, short[] arrSC) {
+
+        // coord within layer
+        short jx;
+        short ky;
+        /*
+        for (int i = 0; i <= 3; i++) {
+            arrWL[i] = getCoord(arrSC[i]);
+        }
+        */
+
+        System.out.println("("+arrSC[0]+","+arrSC[1]+")x("+arrSC[2]+","+arrSC[3]+")");
+
+
+        for (short j = arrSC[0]; j < arrSC[2]; j++) {
+            for (short k = arrSC[1]; k < arrSC[3]; k++) {
+
+                //        5 layer - \/    \/ - 0 layer
+                //arr[j][k] = 0b00_0010_0001
+                short layer = getLayer(arrSC[0]);
+                short checkbit = (short)(1 << layer); // ex. 0b00_0010_0000
+                jx = getCoord(j);
+                ky = getCoord(k);
+                if (!isExistBit(arr[jx][ky],checkbit)) {
+                    arr[jx][ky] = setBit(arr[jx][ky], checkbit);
+                    square++;
+                }
+            }
+        }
     }
 
+    private static void printArray(short[][] arr) {
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 10; j++) {
+                System.out.print(Integer.toBinaryString(arr[i][j])+" ");
+            }
+            System.out.println();
+        }
+    }
     private static byte getLayer(int val){
-        return (byte)(val / 2000);
+        return (byte)(val / LAYER_SIZE);
+    }
+    private static short getCoord(short coord){
+        return (short)(coord % LAYER_SIZE);
+    }
+    private static short setBit(short src, short newBit){
+        //set need bit        x or 0x0000
+        return (short)(src | newBit);
+    }
+    private static boolean isExistBit(short src, short newBit){
+        //check, exist bit or no        x and 0xFFFF = x
+        return ((src & newBit) == newBit);
+    }
+    private static short resetBit(short src, short newBit){
+        //change bit to 0        x xor 0x0010
+        return (short)(src ^ newBit);
     }
 }
