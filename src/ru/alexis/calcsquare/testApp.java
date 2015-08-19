@@ -1,6 +1,5 @@
 package ru.alexis.calcsquare;
 
-import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -35,16 +34,22 @@ import java.util.regex.Pattern;
 public class testApp {
 
     private static final short LAYER_SIZE = 2000;
+    private static final short MAX_VALUE = 10000;
+    private static int square = 0;                // calculated square
+    private static boolean isCheckAllFile = true; // if fond wrong line than continue to next check
+    private static short[] arrSC = new short[4];
+    private static short arrcoord[] = new short[4];
+    //private static short arr[][] = new short[LAYER_SIZE][LAYER_SIZE];
+    private static StringBuilder arr[][] = new StringBuilder[LAYER_SIZE][LAYER_SIZE];
     private static BufferedReader is;
     private static BufferedWriter out;
-    private static int square = 0;                // calculated square
-    private static boolean isCheckAllFile = true; // if finded wrong line than continue next check
-    private static short[] arrSC = new short[4];
+    static StringBuilder checkbit = new StringBuilder(100);
 
     public static void main(String[] args) {
 
         Runtime r = Runtime.getRuntime();
-        System.out.println("Mem (" + r.totalMemory()/1024 +"): " + r.freeMemory()/1024);
+        System.out.println("Mem (" + r.totalMemory()/1024 +"kb): " + r.freeMemory()/1024 + "kb: used "
+        + (r.totalMemory()/1024 - r.freeMemory()/1024)+ "kb");
 
         if(!(args.length == 2 && args[0].equalsIgnoreCase("input.txt") && args[1].equalsIgnoreCase("output.txt"))){
             System.out.println("Wrong input parameters. Must entered input.txt and output.txt files.");
@@ -54,14 +59,11 @@ public class testApp {
         String line;
         ArrayList<String> lines = new ArrayList<String>(100);
         //short arr[][] = new short[20][20];
-        short arr[][] = new short[2000][2000];
-        short arrcoord[] = new short[4];
-        short x1,x2,y1,y2;
 
         Pattern p = Pattern.compile("^(-?\\d+\\s){3}-?\\d+\\s?$");
+        //Pattern p = Pattern.compile("^(-?((\\d\\d{0,3})|([1]0{0,4}))\\s){3}-?\\d{1,4}\\s?$");
         Matcher m = p.matcher("");
 
-        System.out.println("Mem (" + r.totalMemory()/1024 +"): " + r.freeMemory()/1024);
         System.out.println("Start calc square");
 
         try {
@@ -99,38 +101,8 @@ public class testApp {
 
             line = lines.get(i);
             System.out.println(line);
-            String c[] = line.split(" ");
 
-            x1 = Short.parseShort(c[0]);
-            y1 = Short.parseShort(c[1]);
-            x2 = Short.parseShort(c[2]);
-            y2 = Short.parseShort(c[3]);
-
-            for (short j = 0; j <= 3; j++) {
-                arrSC[j] = (short)(Short.parseShort(c[j])+10000);
-            }
-            if (arrSC[2] < arrSC[0]){
-                short res = arrSC[0];
-                arrSC[0] = arrSC[2];
-                arrSC[2] = res;
-            }
-            if (arrSC[3] < arrSC[1]){
-                short res = arrSC[1];
-                arrSC[1] = arrSC[3];
-                arrSC[3] = res;
-            }
-//            System.out.println(getLayer(x1*1010) + "x"+(x1*1010%2000)+"=" + getLayer(y1*1010)+"x"+(y1*1010%2000));
-//            System.out.println(getLayer(x2*1010) + "x"+(x2*1010%2000)+"=" + getLayer(y2*1010)+"x"+(y2*1010%2000));
-            if(square > 0 && x1>=arrcoord[0] && x2<=arrcoord[2] & y1>=arrcoord[1] & y2<=arrcoord[3]){
-                // this figure less than previous. Nothing to calc
-            }else {
-                calcRect(arr, arrSC);
-            }
-
-            arrcoord[0] = x1;
-            arrcoord[1] = y1;
-            arrcoord[2] = x2;
-            arrcoord[3] = y2;
+            calcRect(line);
         }
 
         try {
@@ -148,67 +120,107 @@ public class testApp {
         }
         System.out.println("Finally square is " + square);
 
-        printArray(arr);
+        //printArray(arr);
 
-        Runtime r2 = Runtime.getRuntime();
-        System.out.println("Mem (" + r2.totalMemory()/1024 +"): " + r2.freeMemory()/1024);
+        System.out.println("Mem (" + r.totalMemory()/1024 +"kb): " + r.freeMemory()/1024 + "kb: used "
+                + (r.totalMemory()/1024 - r.freeMemory()/1024) + "kb");
+
     }
-    private static void calcRect(short[][] arr, short[] arrSC) {
+    private static void calcRect(String line) {
 
+        String c[] = line.split(" ");
+
+        // add 10000 to number for set unsign number
+        // ex. -10000 + 10000 = 0 and 5000 + 10000 = 15000
+        // dimension arrSC is 0 < j < 20000
+        for (short j = 0; j <= 3; j++) {
+            arrSC[j] = (short)(Short.parseShort(c[j])+MAX_VALUE);
+        }
+        checkbit.setLength(100);
+        /*for (int i = 0; i < 100; i++) {
+            checkbit.setCharAt(i, ' ');
+        }   */
+        // set rect coord to x1, y1 - bottom-left, and x2, y2 - upper-right
+        if (arrSC[2] < arrSC[0]){
+            short res = arrSC[0];
+            arrSC[0] = arrSC[2];
+            arrSC[2] = res;
+        }
+        if (arrSC[3] < arrSC[1]){
+            short res = arrSC[1];
+            arrSC[1] = arrSC[3];
+            arrSC[3] = res;
+        }
+
+//      System.out.println(getLayer(x1*1010) + "x"+(x1*1010%2000)+"=" + getLayer(y1*1010)+"x"+(y1*1010%2000));
+//      System.out.println(getLayer(x2*1010) + "x"+(x2*1010%2000)+"=" + getLayer(y2*1010)+"x"+(y2*1010%2000));
+
+        if(square > 0 && arrSC[0]>=arrcoord[0] && arrSC[2]<=arrcoord[2] & arrSC[1]>=arrcoord[1] & arrSC[3]<=arrcoord[3]){
+            // this figure less than previous. Nothing to calc.
+            return;
+        }
+
+        // write prev coord for analyze on next step
+        for (int i = 0; i < 4; i++) {
+            arrcoord[i] = arrSC[i];
+        }
 
         // coord within layer
-        short jx;
+        short jx; // ex. arrSC[0] = 7000, jx = 1000, layer=3, 0 <= jx < 2000
         short ky;
         /*
         for (int i = 0; i <= 3; i++) {
             arrWL[i] = getCoord(arrSC[i]);
         }
         */
-
         System.out.println("("+arrSC[0]+","+arrSC[1]+")x("+arrSC[2]+","+arrSC[3]+")");
-
 
         for (short j = arrSC[0]; j < arrSC[2]; j++) {
             for (short k = arrSC[1]; k < arrSC[3]; k++) {
 
                 //        5 layer - \/    \/ - 0 layer
                 //arr[j][k] = 0b00_0010_0001
-                short layer = getLayer(arrSC[0]);
-                short checkbit = (short)(1 << layer); // ex. 0b00_0010_0000
+                short layer = getLayer(j, k); // ???
+                //int checkbit = 1 << layer; // ex. 0b00_0010_0000
+
+                checkbit.setCharAt(layer, '1');
                 jx = getCoord(j);
                 ky = getCoord(k);
-                if (!isExistBit(arr[jx][ky],checkbit)) {
-                    arr[jx][ky] = setBit(arr[jx][ky], checkbit);
+                if (arr[jx][ky].charAt(layer)!='1') {
+                //if (!isExistBit(arr[jx][ky],checkbit, layer)) {
+                    arr[jx][ky].setCharAt(layer, '1');
+                    //arr[jx][ky] = setBit(arr[jx][ky], checkbit, layer);
                     square++;
                 }
             }
         }
     }
 
-    private static void printArray(short[][] arr) {
-        for (int i = 0; i < 10; i++) {
-            for (int j = 0; j < 10; j++) {
+    private static void printArray(int[][] arr) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
                 System.out.print(Integer.toBinaryString(arr[i][j])+" ");
             }
             System.out.println();
         }
     }
-    private static byte getLayer(int val){
-        return (byte)(val / LAYER_SIZE);
+    private static byte getLayer(short valx, short valy){
+        return (byte)( valx / LAYER_SIZE + (valy/ LAYER_SIZE)*MAX_VALUE/LAYER_SIZE);
     }
     private static short getCoord(short coord){
         return (short)(coord % LAYER_SIZE);
     }
-    private static short setBit(short src, short newBit){
+    private static int setBit(long src, long newBit){
         //set need bit        x or 0x0000
-        return (short)(src | newBit);
+        return (int)(src | newBit);
     }
-    private static boolean isExistBit(short src, short newBit){
+    private static boolean isExistBit(long src, long newBit){
         //check, exist bit or no        x and 0xFFFF = x
+        //return ((src & newBit) == newBit);
         return ((src & newBit) == newBit);
     }
-    private static short resetBit(short src, short newBit){
+    private static int resetBit(int src, int newBit){
         //change bit to 0        x xor 0x0010
-        return (short)(src ^ newBit);
+        return (int)(src ^ newBit);
     }
 }
