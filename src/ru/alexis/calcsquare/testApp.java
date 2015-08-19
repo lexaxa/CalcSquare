@@ -43,7 +43,7 @@ public class testApp {
     private static StringBuilder arr[][] = new StringBuilder[LAYER_SIZE][LAYER_SIZE];
     private static BufferedReader is;
     private static BufferedWriter out;
-    static StringBuilder checkbit = new StringBuilder(100);
+    static StringBuilder checkbit = new StringBuilder();
 
     public static void main(String[] args) {
 
@@ -60,11 +60,17 @@ public class testApp {
         ArrayList<String> lines = new ArrayList<String>(100);
         //short arr[][] = new short[20][20];
 
+        for (int i = 0; i < 100; i++) {
+            checkbit.append(' ');
+        }
+
         Pattern p = Pattern.compile("^(-?\\d+\\s){3}-?\\d+\\s?$");
         //Pattern p = Pattern.compile("^(-?((\\d\\d{0,3})|([1]0{0,4}))\\s){3}-?\\d{1,4}\\s?$");
         Matcher m = p.matcher("");
 
         System.out.println("Start calc square");
+
+
 
         try {
             is = new BufferedReader(new FileReader(args[0]));
@@ -186,8 +192,8 @@ public class testApp {
                 checkbit.setCharAt(layer, '1');
                 jx = getCoord(j);
                 ky = getCoord(k);
-                if (arr[jx][ky].charAt(layer)!='1') {
-                //if (!isExistBit(arr[jx][ky],checkbit, layer)) {
+                //if (arr[jx][ky].charAt(layer)!='1') {
+                if (!isExistBit(arr[jx][ky], layer)) {
                     arr[jx][ky].setCharAt(layer, '1');
                     //arr[jx][ky] = setBit(arr[jx][ky], checkbit, layer);
                     square++;
@@ -218,6 +224,15 @@ public class testApp {
         //check, exist bit or no        x and 0xFFFF = x
         //return ((src & newBit) == newBit);
         return ((src & newBit) == newBit);
+    }
+    private static boolean isExistBit(StringBuilder src, short layer){
+        //return ((src & newBit) == newBit);
+        System.out.println("layer " + layer);
+        for (int i = src.length(); i <= layer; i++) {
+            src.append(' ');
+        }
+        return src.charAt(layer) == '1';
+
     }
     private static int resetBit(int src, int newBit){
         //change bit to 0        x xor 0x0010

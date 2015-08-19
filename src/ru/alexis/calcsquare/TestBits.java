@@ -11,6 +11,22 @@ public class TestBits {
         short x1= 0b00_0010_0000; // add number to layer
         short arr[][] = new short[3][3];
 
+        StringBuilder str = new StringBuilder();
+
+
+        for (int i = 0; i < 20; i++) {
+            str.append('o');
+        }
+        changeStr(str);
+        for (int i = 0; i < 20; i++) {
+            System.out.println(str.charAt(i));
+        }
+
+        str.setCharAt(10,'1');
+        System.out.println(str.charAt(10));
+
+
+
         arr[0][0]=0;
         arr[0][1]=0;
         arr[0][2]=0;
@@ -32,6 +48,9 @@ public class TestBits {
 
         System.out.println(x2);
         System.out.println(Integer.toBinaryString(x2 | 0x00_0010_0000) + "=" + Integer.toBinaryString(x | x1));
+    }
+    private static void changeStr(StringBuilder str){
+        str.append("hello");
     }
 
     private static void changeArr(short[][] arr) {
