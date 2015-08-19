@@ -62,4 +62,6 @@ public class TestBits {
         //change bit to 0        x xor 0x0010
         return (short)(src ^ newBit);
     }
+
+
 }

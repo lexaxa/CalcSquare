@@ -155,6 +155,7 @@ public class testApp {
     }
     private static void calcRect(short[][] arr, short[] arrSC) {
 
+
         // coord within layer
         short jx;
         short ky;
