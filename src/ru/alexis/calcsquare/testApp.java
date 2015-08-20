@@ -33,19 +33,19 @@ import java.util.regex.Pattern;
 
 public class testApp {
 
-    private static final short LAYER_SIZE = 1000;
+    private static final short LAYER_SIZE = 2000;
     private static final short MAX_VALUE = 10000;
     private static int square = 0;                // calculated square
     private static boolean isCheckAllFile = true; // if fond wrong line than continue to next check
     private static short[] arrSC = new short[4];
     private static short arrcoord[] = new short[4];
     //private static short arr[][] = new short[LAYER_SIZE][LAYER_SIZE];
-    private static StringBuilder arr[][] = new StringBuilder[LAYER_SIZE][LAYER_SIZE];
+    private static StringBuffer arr[][] = new StringBuffer[LAYER_SIZE][LAYER_SIZE];
     private static BufferedReader is;
     private static BufferedWriter out;
     static StringBuilder checkbit = new StringBuilder();
-    static byte edge = 27;
-
+    static byte edge = 28;
+    static byte[] arrilayer= new byte[3];
     public static void main(String[] args) {
 
         Runtime r = Runtime.getRuntime();
@@ -188,38 +188,45 @@ public class testApp {
 
                 //        5 layer - \/    \/ - 0 layer
                 //arr[j][k] = 0b00_0010_0001
-                layer = getLayer(y, x); // ???
+                layer = getLayer(y, x);
                 //int checkbit = 1 << layer; // ex. 0b00_0010_0000
 
                 //checkbit.setCharAt(layer, '1');
                 yy = getCoord(y);
                 xx = getCoord(x);
                 if (arr[yy][xx]== null) {
-                    arr[yy][xx] = new StringBuilder();
+                    arr[yy][xx] = new StringBuffer();
                 }
                 //if (arr[jx][ky].charAt(layer)!='1') {
                 if (!isExistBit(xx, yy, layer)) {
-                    //arr[yy][xx].setCharAt(layer, '1');
-                    //arr[jx][ky] = setBit(arr[jx][ky], checkbit, layer);
                     square++;
                 }
             }
         }
     }
-
-    private static void printArray(int[][] arr) {
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                System.out.print(Integer.toBinaryString(arr[i][j])+" ");
+    private static boolean isExistBit(short x, short y, short layer){
+        //return ((src & newBit) == newBit);
+        // System.out.println("layer " + layer);
+        short ilayer = (short)(layer/edge); // 0..3
+        short ipos = (short)(layer% edge);
+        try {
+            for (int i = arr[y][x].length(); i <= ipos; i++) {
+                arr[y][x].append(0b0);
             }
-            System.out.println();
+            char checkchar = arr[y][x].charAt(ipos);
+            if (!isExistBit(arr[y][x].codePointAt(ipos), 1 << ilayer)) {
+                arr[y][x].setCharAt(ipos, (char) (setBit(checkchar, 1 << ilayer)));
+                return true;
+            } else {
+                return false;
+            }
+        }catch (Exception e){
+            System.out.println(ilayer + "=" + ipos + "=" + arr[y][x].length()+"="+arr[y][x]);
+            e.printStackTrace();
+            System.exit(-1);
+            return false;
         }
-    }
-    private static byte getLayer(short valy, short valx){
-        return (byte)( valx / LAYER_SIZE + (valy/ LAYER_SIZE)*MAX_VALUE/LAYER_SIZE);
-    }
-    private static short getCoord(short coord){
-        return (short)(coord % LAYER_SIZE);
+
     }
     private static int setBit(long src, long newBit){
         //set need bit        x or 0x0000
@@ -230,28 +237,25 @@ public class testApp {
         //return ((src & newBit) == newBit);
         return ((src & newBit) == newBit);
     }
-    private static boolean isExistBit(short x, short y, short layer){
-        //return ((src & newBit) == newBit);
-       // System.out.println("layer " + layer);
-        byte ipos = (byte)(layer%edge);
-        byte ilayer = (byte)(layer/edge); // 0..3
-        for (int i = arr[y][x].length(); i <= ipos; i++) {
-            arr[y][x].append(0);
-        }
-        char checkchar = getChar(ilayer);
-        if(arr[y][x].charAt(ilayer) == checkchar){
-            arr[y][x].setCharAt(layer, checkchar);
-            return true;
-        }else {
-            return false;
-        }
-
-    }
     private static char getChar(byte ilayer){
         return (char)(1<<ilayer);
     }
     private static int resetBit(int src, int newBit){
         //change bit to 0        x xor 0x0010
         return src ^ newBit;
+    }
+    private static byte getLayer(short valy, short valx){
+        return (byte)( valx / LAYER_SIZE + (valy/ LAYER_SIZE)*MAX_VALUE/LAYER_SIZE);
+    }
+    private static short getCoord(short coord){
+        return (short)(coord % LAYER_SIZE);
+    }
+    private static void printArray(int[][] arr) {
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                System.out.print(Integer.toBinaryString(arr[i][j])+" ");
+            }
+            System.out.println();
+        }
     }
 }

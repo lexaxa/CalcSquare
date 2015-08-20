@@ -49,7 +49,16 @@ public class TestBits {
 
         System.out.println(x2);
         //System.out.println(Integer.toBinaryString(x2 | 0x00_0010_0000) + "=" + Integer.toBinaryString(x | x1));
+        byte[] arrilayer = new byte[3];
+        byte ilayer = 2;
+        String s = arrilayer.toString();
+        System.out.println("===="+(char)(arrilayer[ilayer]=1));
+        System.out.println("===="+(char)(arrilayer[ilayer-1]=1));
+        System.out.println("===="+(char)(arrilayer[ilayer-2]=1));
+
+
     }
+
     private static void changeStr(StringBuilder str){
         str.append("hello");
     }
