@@ -31,20 +31,19 @@ import java.util.regex.Pattern;
  2 2 4 4
  */
 
-public class testApp {
+public class testApp2 {
 
-    private static final short LAYER_SIZE = 1000;
+    private static final short LAYER_SIZE = 2000;
     private static final short MAX_VALUE = 10000;
     private static int square = 0;                // calculated square
     private static boolean isCheckAllFile = true; // if fond wrong line than continue to next check
     private static short[] arrSC = new short[4];
     private static short arrcoord[] = new short[4];
     //private static short arr[][] = new short[LAYER_SIZE][LAYER_SIZE];
-    private static StringBuilder arr[][] = new StringBuilder[LAYER_SIZE][LAYER_SIZE];
+    private static int arr[][] = new int[LAYER_SIZE][LAYER_SIZE];
     private static BufferedReader is;
     private static BufferedWriter out;
-    static StringBuilder checkbit = new StringBuilder();
-    static byte edge = 27;
+    static int checkbit;
 
     public static void main(String[] args) {
 
@@ -59,12 +58,11 @@ public class testApp {
 
         String line;
         ArrayList<String> lines = new ArrayList<String>(100);
-        //short arr[][] = new short[20][20];
-
-        for (int i = 0; i <= edge; i++) {
-            checkbit.append('\u0000');
+                 /*
+        for (int i = 0; i < 100; i++) {
+            checkbit.append(' ');
         }
-
+               */
         //Pattern p = Pattern.compile("^(-?\\d+\\s){3}-?\\d+\\s?$");
         //Pattern p = Pattern.compile("^(-?((\\d\\d{0,3})|([1]0{0,4}))\\s){3}-?\\d{1,4}\\s?$");
         Pattern p = Pattern.compile("^((-?(([1]0{4})|(\\d\\d{0,3})))\\s){3}-?(([1]0{4})|(\\d\\d{0,3}))\\s?$");
@@ -79,8 +77,6 @@ public class testApp {
             is = new BufferedReader(new FileReader(args[0]));
             out = new BufferedWriter(new FileWriter(args[1]));
 
-            StringBuilder stringBuilder = new StringBuilder();
-
             // check for wrong lines and add to array
             while ((line = is.readLine()) != null) {
                 m.reset(line);
@@ -91,7 +87,6 @@ public class testApp {
                     System.out.println("Ok line #" + line);
 
                     lines.add(line);
-                    stringBuilder.append(line);
                 }
             }
         }catch(Exception e) {
@@ -129,7 +124,7 @@ public class testApp {
         }
         System.out.println("Finally square is " + square);
 
-        //printArray(arr);
+        printArray(arr);
 
         System.out.println("Mem (" + r.totalMemory()/1024 +"kb): " + r.freeMemory()/1024 + "kb: used "
                 + (r.totalMemory()/1024 - r.freeMemory()/1024) + "kb");
@@ -146,6 +141,9 @@ public class testApp {
             arrSC[j] = (short)(Short.parseShort(c[j])+MAX_VALUE);
         }
 
+        /*for (int i = 0; i < 100; i++) {
+            checkbit.setCharAt(i, ' ');
+        }   */
         // set rect coord to x1, y1 - bottom-left, and x2, y2 - upper-right
         if (arrSC[2] < arrSC[0]){
             short res = arrSC[0];
@@ -189,16 +187,14 @@ public class testApp {
                 //        5 layer - \/    \/ - 0 layer
                 //arr[j][k] = 0b00_0010_0001
                 layer = getLayer(y, x); // ???
-                //int checkbit = 1 << layer; // ex. 0b00_0010_0000
+                int checkbit = 1 << layer; // ex. 0b00_0010_0000
 
                 //checkbit.setCharAt(layer, '1');
                 yy = getCoord(y);
                 xx = getCoord(x);
-                if (arr[yy][xx]== null) {
-                    arr[yy][xx] = new StringBuilder();
-                }
                 //if (arr[jx][ky].charAt(layer)!='1') {
-                if (!isExistBit(xx, yy, layer)) {
+                if (!isExistBit(arr[yy][xx], layer)) {
+                    arr[yy][xx] = setBit(arr[yy][xx], checkbit);
                     //arr[yy][xx].setCharAt(layer, '1');
                     //arr[jx][ky] = setBit(arr[jx][ky], checkbit, layer);
                     square++;
@@ -230,26 +226,15 @@ public class testApp {
         //return ((src & newBit) == newBit);
         return ((src & newBit) == newBit);
     }
-    private static boolean isExistBit(short x, short y, short layer){
+    /*private static boolean isExistBit(short x, short y, short layer){
         //return ((src & newBit) == newBit);
        // System.out.println("layer " + layer);
-        byte ipos = (byte)(layer%edge);
-        byte ilayer = (byte)(layer/edge); // 0..3
-        for (int i = arr[y][x].length(); i <= ipos; i++) {
-            arr[y][x].append(0);
+        for (int i = arr[y][x]; i <= layer; i++) {
+            arr[y][x].append(' ');
         }
-        char checkchar = getChar(ilayer);
-        if(arr[y][x].charAt(ilayer) == checkchar){
-            arr[y][x].setCharAt(layer, checkchar);
-            return true;
-        }else {
-            return false;
-        }
+        return arr[y][x].charAt(layer) == '1';
 
-    }
-    private static char getChar(byte ilayer){
-        return (char)(1<<ilayer);
-    }
+    }     */
     private static int resetBit(int src, int newBit){
         //change bit to 0        x xor 0x0010
         return src ^ newBit;

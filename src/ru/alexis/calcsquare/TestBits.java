@@ -6,10 +6,10 @@ package ru.alexis.calcsquare;
 public class TestBits {
     public static void main(String[] args) {
 
-        short p = 0b11_1111_1111;
-        short x = 0b00_0001_0001;
-        short x1= 0b00_0010_0000; // add number to layer
-        short arr[][] = new short[3][3];
+        float p = 0b11_1111_1111;
+        float x = 0b00_0001_0001;
+        float x1= 0b00_0010_0000; // add number to layer
+        float arr[][] = new float[3][3];
 
         StringBuilder str = new StringBuilder();
 
@@ -24,6 +24,7 @@ public class TestBits {
 
         str.setCharAt(10,'1');
         System.out.println(str.charAt(10));
+        System.out.println(28%28 + "=" + 33%28 + "=" + 15%28 + "=" + 27%28 + "+"+(char)(1000));
 
 
 
@@ -35,36 +36,36 @@ public class TestBits {
         arr[1][2]=1;
 
         printArray(arr);
-
+        System.out.println("===");
         changeArr(arr);
 
         printArray(arr);
 
 
-        System.out.println(Integer.toBinaryString(x & p));
-        System.out.println(Integer.toBinaryString(x & x1) + "=" + ((x & x1) == x1));
+        //System.out.println(Integer.toBinaryString(x & p));
+        //System.out.println(Integer.toBinaryString(x & x1) + "=" + ((x & x1) == x1));
 
         short x2= 0b00_0010_0001;
 
         System.out.println(x2);
-        System.out.println(Integer.toBinaryString(x2 | 0x00_0010_0000) + "=" + Integer.toBinaryString(x | x1));
+        //System.out.println(Integer.toBinaryString(x2 | 0x00_0010_0000) + "=" + Integer.toBinaryString(x | x1));
     }
     private static void changeStr(StringBuilder str){
         str.append("hello");
     }
 
-    private static void changeArr(short[][] arr) {
-        arr[0][0]=1;
+    private static void changeArr(float[][] arr) {
+        arr[0][0]=0;
         arr[0][1]=1;
-        arr[0][2]=1;
-        arr[1][0]=2;
+        arr[0][2]=2;
+        arr[1][0]=1;
         arr[1][1]=2;
-        arr[1][2]=2;
+        arr[1][2]=3;
     }
-    private static void printArray(short[][] arr) {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                System.out.print(arr[i][j]+" ");
+    private static void printArray(float[][] arr) {
+        for (int y = 0; y < 2; y++) {
+            for (int x = 0; x < 3; x++) {
+                System.out.print(arr[y][x]+" ");
             }
             System.out.println();
         }
