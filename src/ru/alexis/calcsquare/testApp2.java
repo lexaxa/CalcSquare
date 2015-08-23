@@ -2,6 +2,7 @@ package ru.alexis.calcsquare;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +36,7 @@ public class testApp2 {
 
     private static final short LAYER_SIZE = 2000;
     private static final short MAX_VALUE = 10000;
-    private static final byte LAYER_LIMIT = 20;
+    private static final byte LAYER_LIMIT = 30;
     private static int square = 0;                // calculated square
     private static boolean isCheckAllFile = true; // if fond wrong line than continue to next check
     private static short[] arrSC = new short[4];
@@ -43,6 +44,7 @@ public class testApp2 {
     private static int arr[][] = new int[LAYER_SIZE][LAYER_SIZE];
     private static BufferedReader is;
     private static BufferedWriter out;
+    private static Stack<String> stack = new Stack<String>();
 
     public static void main(String[] args) {
 
@@ -79,10 +81,28 @@ public class testApp2 {
                     System.out.println("Ok line #" + line);
                     short[] res = getRightRect(line);
                     StringBuilder sb = new StringBuilder();
+                    /*
                     for (byte j = 0; j <= 3; j++) {
-                        sb.append(res[j] + MAX_VALUE + " ");
+                        sb.append(res[j] +  " ");
                     }
                     lines.add(sb.toString());
+                     */
+                    //divide rect for 6k sections
+                    short st = res[1];
+                    for (int i = 0; i < 3; i++) {
+                        if(st<=6000*i && res[3] >6000*(i+1)){
+                            lines.add(res[0] + " " + st + " " + res[2] + " " + 6000*(i+1));
+                        }
+                    }
+                    while(res[1]<6000 && res[3] >6000){
+
+                        lines.add(res[0] + " " + res[1] + " " + res[2] + " " + 6000);
+                        lines.add(res[0] + " " + 6000   + " " + res[2] + " " + res[3]);
+
+                    }
+
+                    //divide rect for 6k height
+                    //while(false){}
                 }
             }
         }catch(Exception e) {
@@ -100,9 +120,7 @@ public class testApp2 {
         shell(lines);
         System.out.println(lines);
 
-        for (int i = 0; i < lines.size(); i++) {
-            calcRect(lines.get(i));
-        }
+        calcRect(lines);
 
         try {
             out.write(square + "");
@@ -125,62 +143,74 @@ public class testApp2 {
                 + (r.totalMemory()/1024 - r.freeMemory()/1024) + "kb");
 
     }
-    // from rosettacode.org/
-    public static void shell(ArrayList<String> a) {
-        int increment = a.size() / 2;
-        while (increment > 0) {
-            for (int i = increment; i < a.size(); i++) {
-                int j = i;
-                int temp = Integer.parseInt(a.get(i).split(" ")[0]);
-                String stemp = a.get(i);
-                while (j >= increment && Integer.parseInt(a.get(j - increment).split(" ")[0]) > temp) {
-                    a.set(j, a.get(j - increment));
-                    j = j - increment;
-                }
-                a.set(j, stemp);
+    private static void calcRect(ArrayList<String> lines) {
+
+        String line;
+        byte period = 0;
+
+        for (int iline = 0; iline < lines.size(); iline++) {
+
+            line = lines.get(iline);
+            String c[] = line.split(" ");
+            for (short j = 0; j <= 3; j++) {
+                arrSC[j] = Short.parseShort(c[j]);
             }
-            if (increment == 2) {
-                increment = 1;
-            } else {
-                increment *= (5.0 / 11);
+
+            if (square > 0 && arrSC[0] >= arrcoord[0] && arrSC[2] <= arrcoord[2] & arrSC[1] >= arrcoord[1] & arrSC[3] <= arrcoord[3]) {
+                // this figure less than previous. Nothing to calc.
+                continue;
+            }
+
+            //TODO for enhanced performance save prev rect and compare it with next rects
+            // ??? write prev coord for analyze on next step
+            for (int i = 0; i < 4; i++) {
+                arrcoord[i] = arrSC[i];
+            }
+
+            if(arrSC[1] >= 6000*period && arrSC[1]< 6000*(period+1) && arrSC[1] % 6000 == 0){
+
+                System.out.println("line size="+ lines.size());
+                while(!stack.empty()){
+                    lines.add(iline+1, stack.pop());
+                }
+                System.out.println("line size after="+lines.size());
+
+                calcSquare(line);
+                System.out.println("Reset before " + arrSC[1] + ". Square=" + square);
+                resetRegion();
+                period++;
+            }else{
+                calcSquare(line);
             }
         }
     }
-    private static void calcRect(String line) {
+
+    public static void calcSquare(String line){
 
         // coord within layer
         short xx; // ex. arrSC[0] = 7000, jx = 1000, layer=3, 0 <= jx < 2000
         short yy;
         short layer;
 
-        getRightRect(line);
-
-        if(square > 0 && arrSC[0]>=arrcoord[0] && arrSC[2]<=arrcoord[2] & arrSC[1]>=arrcoord[1] & arrSC[3]<=arrcoord[3]){
-            // this figure less than previous. Nothing to calc.
-            return;
+        String c[] = line.split(" ");
+        for (short j = 0; j <= 3; j++) {
+            arrSC[j] = Short.parseShort(c[j]);
         }
 
-        //TODO for enchanced performance save prev rect and compare it with next rects
-        // ??? write prev coord for analyze on next step
-        for (int i = 0; i < 4; i++) {
-            arrcoord[i] = arrSC[i];
-        }
-
-       System.out.println("("+arrSC[0]+","+arrSC[1]+")x("+arrSC[2]+","+arrSC[3]+")");
+        System.out.println("(" + arrSC[0] + "," + arrSC[1] + ")x(" + arrSC[2] + "," + arrSC[3] + ")");
 
         for (short y = arrSC[1]; y < arrSC[3]; y++) {
 
-            if(y==5000) {
+            if (y == 5000) {
+                // for debug
                 y = 5000;
             }
 
 
-            if(y>=6000 && y % 6000 == 0){
-                System.out.println("Reset before " + y + ". Square is " + square);
-                for (int i = 0; i < LAYER_SIZE; i++) {
-                    for (int j = 0; j < LAYER_SIZE; j++) {
-                        arr[i][j] = 0;
-                    }
+            if (y >= 6000 && y % 6000 == 0) {
+                if(arrSC[1] != y) {
+                    stack.push(arrSC[0] + " " + y + " " + arrSC[2] + " " + arrSC[3]);
+                    return;
                 }
             }
 
@@ -191,10 +221,19 @@ public class testApp2 {
 
                 yy = getCoord(y); // y = 15000; yy = 1000;
                 xx = getCoord(x);
-                if (!isExistBit(arr[yy][xx], layer)) {
+                if (!isExistBit(arr[yy][xx], checkbit)) {
                     arr[yy][xx] = setBit(arr[yy][xx], checkbit);
                     square++;
                 }
+            }
+        }
+
+    }
+
+    private static void resetRegion() {
+        for (int i = 0; i < LAYER_SIZE; i++) {
+            for (int j = 0; j < LAYER_SIZE; j++) {
+                arr[i][j] = 0;
             }
         }
     }
@@ -205,7 +244,7 @@ public class testApp2 {
         // ex. -10000 + 10000 = 0 and 5000 + 10000 = 15000
         // dimension arrSC is 0 < j < 20000
         for (short j = 0; j <= 3; j++) {
-            arrSC[j] = Short.parseShort(c[j]);
+            arrSC[j] = (short)(Short.parseShort(c[j])+ MAX_VALUE);
         }
 
         // set rect coord to x1, y1 - bottom-left, and x2, y2 - upper-right
@@ -228,6 +267,27 @@ public class testApp2 {
                 //System.out.print(Long.toBinaryString(arr[i][j])+" ");
             }
             System.out.println();
+        }
+    }
+    // from rosettacode.org/
+    public static void shell(ArrayList<String> a) {
+        int increment = a.size() / 2;
+        while (increment > 0) {
+            for (int i = increment; i < a.size(); i++) {
+                int j = i;
+                int temp = Integer.parseInt(a.get(i).split(" ")[0]);
+                String stemp = a.get(i);
+                while (j >= increment && Integer.parseInt(a.get(j - increment).split(" ")[0]) > temp) {
+                    a.set(j, a.get(j - increment));
+                    j = j - increment;
+                }
+                a.set(j, stemp);
+            }
+            if (increment == 2) {
+                increment = 1;
+            } else {
+                increment *= (5.0 / 11);
+            }
         }
     }
     private static byte getLayer(short valy, short valx){
