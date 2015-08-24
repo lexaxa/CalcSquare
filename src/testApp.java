@@ -59,8 +59,7 @@ public class testApp {
         ta.writeSquare();
         //printArray(arr);
         Runtime r = Runtime.getRuntime();
-        System.out.println("Mem (" + r.totalMemory()/1024 +"kb): " + r.freeMemory()/1024 + "kb: used "
-                + (r.totalMemory()/1024 - r.freeMemory()/1024) + "kb");
+        System.out.println("Mem (" + r.totalMemory()/1024 +"kb): " + r.freeMemory()/1024 + "kb: used " + (r.totalMemory()/1024 - r.freeMemory()/1024) + "kb");
     }
     private void readLines(String isArg, String outArg){
         String line;
@@ -72,6 +71,7 @@ public class testApp {
         try {
             is = new BufferedReader(new FileReader(isArg));
             out = new BufferedWriter(new FileWriter(outArg));
+            System.out.println("INPUT:");
 
             // check for wrong lines and add correct lines to array
             while ((line = is.readLine()) != null) {
@@ -87,7 +87,7 @@ public class testApp {
                 } else {
                     //System.out.println("Ok line #" + line);
                     short[] res = getRightRect(line);
-
+                    System.out.println(line);
                     //divide rect for 6k sections
                     // 0       6000   12000   18000   20000
                     // |        |       |       |       |
@@ -125,7 +125,7 @@ public class testApp {
         }
     }
     private void writeSquare(){
-        System.out.println("Finally square is " + square);
+        System.out.println("OUTPUT:\n" + square);
 
         try {
             out.write(square + "");
@@ -145,7 +145,7 @@ public class testApp {
 
         String line;
         byte period = 0;
-        System.out.println("Start calc square");
+        //System.out.println("Start calc square");
 
         for (int iline = 0; iline < lines.size(); iline++) {
 
@@ -166,7 +166,7 @@ public class testApp {
                 arrcoord[i] = arrSC[i];
             }
             if(arrSC[1]/ REGION_SIZE > period){
-                System.out.println("Reset before " + arrSC[1] + ". Square=" + square);
+                //System.out.println("Reset before " + arrSC[1] + ". Square=" + square);
                 resetRegion();
                 period++;
             }
@@ -180,7 +180,7 @@ public class testApp {
         short yy;
         short layer;
 
-        System.out.println("(" + arrSC[0] + "," + arrSC[1] + ")x(" + arrSC[2] + "," + arrSC[3] + ")");
+        //System.out.println("(" + arrSC[0] + "," + arrSC[1] + ")x(" + arrSC[2] + "," + arrSC[3] + ")");
 
         for (short y = arrSC[1]; y < arrSC[3]; y++) {
             for (short x = arrSC[0]; x < arrSC[2]; x++) {
