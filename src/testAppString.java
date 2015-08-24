@@ -1,5 +1,3 @@
-package ru.alexis.calcsquare;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -31,7 +29,7 @@ import java.util.regex.Pattern;
  2 2 4 4
  */
 
-public class testApp {
+public class testAppString {
 
     private static final short LAYER_SIZE = 2000;
     private static final short MAX_VALUE = 10000;

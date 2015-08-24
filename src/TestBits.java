@@ -1,5 +1,3 @@
-package ru.alexis.calcsquare;
-
 /**
  * Created by Alex on 17.08.2015.
  */

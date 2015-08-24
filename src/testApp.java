@@ -1,8 +1,5 @@
-package ru.alexis.calcsquare;
-
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,95 +29,103 @@ import java.util.regex.Pattern;
  2 2 4 4
  */
 
-public class testApp2 {
+public class testApp {
 
-    private static final short LAYER_SIZE = 2000;
-    private static final short MAX_VALUE = 10000;
-    private static final byte LAYER_LIMIT = 30;
-    private static int square = 0;                // calculated square
-    private static boolean isCheckAllFile = true; // if fond wrong line than continue to next check
-    private static short[] arrSC = new short[4];
-    private static short arrcoord[] = new short[4];
-    private static int arr[][] = new int[LAYER_SIZE][LAYER_SIZE];
-    private static BufferedReader is;
-    private static BufferedWriter out;
-    private static Stack<String> stack = new Stack<String>();
+    private final byte LAYER_LIMIT = 30;
+    private final short LAYER_SIZE = 2000;
+    private final short REGION_SIZE = 6000;
+    private final short MAX_VALUE = 10000;
+    private int square = 0;                // calculated square, max 400M
+    private boolean isCheckAllFile = true; // if fond wrong line then continue to next check
+    private short[] arrSC = new short[4];
+    private short arrcoord[] = new short[4];
+    private int arr[][] = new int[LAYER_SIZE][LAYER_SIZE];
+    private BufferedReader is;
+    private BufferedWriter out;
+    private ArrayList<String> lines = new ArrayList<String>();
 
     public static void main(String[] args) {
 
-        Runtime r = Runtime.getRuntime();
-        System.out.println("Mem (" + r.totalMemory()/1024 +"kb): " + r.freeMemory()/1024 + "kb: used "
-        + (r.totalMemory()/1024 - r.freeMemory()/1024)+ "kb");
-
-        if(!(args.length == 2 && args[0].equalsIgnoreCase("input.txt") && args[1].equalsIgnoreCase("output.txt"))){
+        if (!(args.length == 2 && args[0].equalsIgnoreCase("input.txt") && args[1].equalsIgnoreCase("output.txt"))) {
             System.out.println("Wrong input parameters. Must entered input.txt and output.txt files.");
             return;
         }
 
+        testApp ta = new testApp();
+        ta.readLines(args[0], args[1]);
+        ta.shell(ta.lines);
+        //System.out.println(lines);
+        ta.calcRect(ta.lines);
+        ta.writeSquare();
+        //printArray(arr);
+        Runtime r = Runtime.getRuntime();
+        System.out.println("Mem (" + r.totalMemory()/1024 +"kb): " + r.freeMemory()/1024 + "kb: used "
+                + (r.totalMemory()/1024 - r.freeMemory()/1024) + "kb");
+    }
+    private void readLines(String isArg, String outArg){
         String line;
-        ArrayList<String> lines = new ArrayList<String>(100);
-
-        Pattern p = Pattern.compile("^((-?(([1]0{4})|(\\d\\d{0,3})))\\s){3}-?(([1]0{4})|(\\d\\d{0,3}))\\s?$");
         //Pattern p = Pattern.compile("^(-?((\\d\\d{0,3})|([1]0{0,4}))\\s){3}-?\\d{1,4}\\s?$");
         //Pattern p = Pattern.compile("^(-?\\d+\\s){3}-?\\d+\\s?$");
+        Pattern p = Pattern.compile("^((-?(([1]0{4})|(\\d\\d{0,3})))\\s){3}-?(([1]0{4})|(\\d\\d{0,3}))\\s?$");
         Matcher m = p.matcher("");
 
-        System.out.println("Start calc square");
-
         try {
-            is = new BufferedReader(new FileReader(args[0]));
-            out = new BufferedWriter(new FileWriter(args[1]));
+            is = new BufferedReader(new FileReader(isArg));
+            out = new BufferedWriter(new FileWriter(outArg));
 
             // check for wrong lines and add correct lines to array
             while ((line = is.readLine()) != null) {
                 m.reset(line);
-                if(!m.matches()){
-                    System.out.println("Find wrong line #" + line);
-                    if(!isCheckAllFile) return;
-                }else{
-                    System.out.println("Ok line #" + line);
-                    short[] res = getRightRect(line);
-                    StringBuilder sb = new StringBuilder();
-                    /*
-                    for (byte j = 0; j <= 3; j++) {
-                        sb.append(res[j] +  " ");
+                if (!m.matches()) {
+                    System.out.print("Find wrong line #" + line);
+                    if (!isCheckAllFile) {
+                        System.out.println(" exit from program.");
+                        return;
+                    } else {
+                        System.out.println(" continue check ...");
                     }
-                    lines.add(sb.toString());
-                     */
+                } else {
+                    //System.out.println("Ok line #" + line);
+                    short[] res = getRightRect(line);
+
                     //divide rect for 6k sections
-                    short st = res[1];
-                    for (int i = 0; i < 3; i++) {
-                        if(st<=6000*i && res[3] >6000*(i+1)){
-                            lines.add(res[0] + " " + st + " " + res[2] + " " + 6000*(i+1));
+                    // 0       6000   12000   18000   20000
+                    // |        |       |       |       |
+                    for (int i = 0; i < (MAX_VALUE * 2) / REGION_SIZE; i++) {
+                        if (res[1] >= REGION_SIZE * i && res[1] < REGION_SIZE * (i + 1)) {
+                            if (res[3] < REGION_SIZE * (i + 1)) {
+                                lines.add(res[0] + " " + res[1] + " " + res[2] + " " + res[3]);
+                            } else if (res[3] >= REGION_SIZE * (i + 1) && res[3] < REGION_SIZE * (i + 2)) {
+                                lines.add(res[0] + " " + res[1] + " " + res[2] + " " + REGION_SIZE * (i + 1));
+                                lines.add(res[0] + " " + REGION_SIZE * (i + 1) + " " + res[2] + " " + res[3]);
+                            } else if (res[3] >= REGION_SIZE * (i + 2) && res[3] < REGION_SIZE * (i + 3)) {
+                                lines.add(res[0] + " " + res[1] + " " + res[2] + " " + REGION_SIZE * (i + 1));
+                                lines.add(res[0] + " " + REGION_SIZE * (i + 1) + " " + res[2] + " " + REGION_SIZE * (i + 2));
+                                lines.add(res[0] + " " + REGION_SIZE * (i + 2) + " " + res[2] + " " + res[3]);
+                            } else if (res[3] >= REGION_SIZE * (i + 3) && res[3] < REGION_SIZE * (i + 4)) {
+                                lines.add(res[0] + " " + res[1] + " " + res[2] + " " + REGION_SIZE * (i + 1));
+                                lines.add(res[0] + " " + REGION_SIZE * (i + 1) + " " + res[2] + " " + REGION_SIZE * (i + 2));
+                                lines.add(res[0] + " " + REGION_SIZE * (i + 2) + " " + res[2] + " " + REGION_SIZE * (i + 3));
+                                lines.add(res[0] + " " + REGION_SIZE * (i + 3) + " " + res[2] + " " + res[3]);
+                            }
                         }
                     }
-                    while(res[1]<6000 && res[3] >6000){
-
-                        lines.add(res[0] + " " + res[1] + " " + res[2] + " " + 6000);
-                        lines.add(res[0] + " " + 6000   + " " + res[2] + " " + res[3]);
-
-                    }
-
-                    //divide rect for 6k height
-                    //while(false){}
                 }
             }
-        }catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                if(is != null){
+                if (is != null) {
                     is.close();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
-        shell(lines);
-        System.out.println(lines);
-
-        calcRect(lines);
+    }
+    private void writeSquare(){
+        System.out.println("Finally square is " + square);
 
         try {
             out.write(square + "");
@@ -135,18 +140,12 @@ public class testApp2 {
                 }
             }
         }
-        System.out.println("Finally square is " + square);
-
-        printArray(arr);
-
-        System.out.println("Mem (" + r.totalMemory()/1024 +"kb): " + r.freeMemory()/1024 + "kb: used "
-                + (r.totalMemory()/1024 - r.freeMemory()/1024) + "kb");
-
     }
-    private static void calcRect(ArrayList<String> lines) {
+    private void calcRect(ArrayList<String> lines) {
 
         String line;
         byte period = 0;
+        System.out.println("Start calc square");
 
         for (int iline = 0; iline < lines.size(); iline++) {
 
@@ -162,61 +161,31 @@ public class testApp2 {
             }
 
             //TODO for enhanced performance save prev rect and compare it with next rects
-            // ??? write prev coord for analyze on next step
+            // ??? write only prev coord for analyze on next step
             for (int i = 0; i < 4; i++) {
                 arrcoord[i] = arrSC[i];
             }
-
-            if(arrSC[1] >= 6000*period && arrSC[1]< 6000*(period+1) && arrSC[1] % 6000 == 0){
-
-                System.out.println("line size="+ lines.size());
-                while(!stack.empty()){
-                    lines.add(iline+1, stack.pop());
-                }
-                System.out.println("line size after="+lines.size());
-
-                calcSquare(line);
+            if(arrSC[1]/ REGION_SIZE > period){
                 System.out.println("Reset before " + arrSC[1] + ". Square=" + square);
                 resetRegion();
                 period++;
-            }else{
-                calcSquare(line);
             }
+            calcSquare(arrSC);
         }
     }
-
-    public static void calcSquare(String line){
+    private void calcSquare(short[] arrSC){
 
         // coord within layer
         short xx; // ex. arrSC[0] = 7000, jx = 1000, layer=3, 0 <= jx < 2000
         short yy;
         short layer;
 
-        String c[] = line.split(" ");
-        for (short j = 0; j <= 3; j++) {
-            arrSC[j] = Short.parseShort(c[j]);
-        }
-
         System.out.println("(" + arrSC[0] + "," + arrSC[1] + ")x(" + arrSC[2] + "," + arrSC[3] + ")");
 
         for (short y = arrSC[1]; y < arrSC[3]; y++) {
-
-            if (y == 5000) {
-                // for debug
-                y = 5000;
-            }
-
-
-            if (y >= 6000 && y % 6000 == 0) {
-                if(arrSC[1] != y) {
-                    stack.push(arrSC[0] + " " + y + " " + arrSC[2] + " " + arrSC[3]);
-                    return;
-                }
-            }
-
             for (short x = arrSC[0]; x < arrSC[2]; x++) {
 
-                layer = getLayer(y, x); // ???
+                layer = getLayer(y, x);
                 int checkbit = 1 << layer; // ex. 0b00_0010_0000
 
                 yy = getCoord(y); // y = 15000; yy = 1000;
@@ -227,17 +196,15 @@ public class testApp2 {
                 }
             }
         }
-
     }
-
-    private static void resetRegion() {
+    private void resetRegion() {
         for (int i = 0; i < LAYER_SIZE; i++) {
             for (int j = 0; j < LAYER_SIZE; j++) {
                 arr[i][j] = 0;
             }
         }
     }
-    private static short[] getRightRect(String line) {
+    private short[] getRightRect(String line) {
         String c[] = line.split(" ");
 
         // add 10000 to number for set unsign number
@@ -260,24 +227,15 @@ public class testApp2 {
         }
         return arrSC;
     }
-    private static void printArray(int[][] arr) {
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                System.out.print(Integer.toBinaryString(arr[i][j])+" ");
-                //System.out.print(Long.toBinaryString(arr[i][j])+" ");
-            }
-            System.out.println();
-        }
-    }
     // from rosettacode.org/
-    public static void shell(ArrayList<String> a) {
+    private void shell(ArrayList<String> a) {
         int increment = a.size() / 2;
         while (increment > 0) {
             for (int i = increment; i < a.size(); i++) {
                 int j = i;
-                int temp = Integer.parseInt(a.get(i).split(" ")[0]);
+                int temp = Integer.parseInt(a.get(i).split(" ")[1]);
                 String stemp = a.get(i);
-                while (j >= increment && Integer.parseInt(a.get(j - increment).split(" ")[0]) > temp) {
+                while (j >= increment && Integer.parseInt(a.get(j - increment).split(" ")[1]) > temp) {
                     a.set(j, a.get(j - increment));
                     j = j - increment;
                 }
@@ -290,24 +248,23 @@ public class testApp2 {
             }
         }
     }
-    private static byte getLayer(short valy, short valx){
+    private byte getLayer(short valy, short valx){
         //        5 layer - \/    \/ - 0 layer
-        //arr[j][k] = 0b00_0010_0001
+        //arr[y][x] = 0b00_0010_0001
         return (byte)(( valx / LAYER_SIZE + (valy/ LAYER_SIZE)*MAX_VALUE*2/LAYER_SIZE)%LAYER_LIMIT);
-        //return (byte)( valx / LAYER_SIZE + (valy/ LAYER_SIZE)*MAX_VALUE/LAYER_SIZE);
     }
-    private static short getCoord(short coord){
+    private short getCoord(short coord){
         return (short)(coord % LAYER_SIZE);
     }
-    private static int setBit(long src, long newBit){
+    private int setBit(long src, long newBit){
         //set need bit        x or 0x0000
         return (int)(src | newBit);
     }
-    private static boolean isExistBit(long src, long newBit){
+    private boolean isExistBit(long src, long newBit){
         //check, exist bit or no        x and 0xFFFF = x
         return ((src & newBit) == newBit);
     }
-    private static int resetBit(int src, int newBit){
+    private int resetBit(int src, int newBit){
         //change bit to 0        x xor 0x0010
         return src ^ newBit;
     }
